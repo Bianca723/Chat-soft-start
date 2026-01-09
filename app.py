@@ -1,10 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 import os
-from openai import OpenAI
+import openai
+from twilio.twiml.messaging_response import MessagingResponse
 from knowledge_base import carregar_base
 
-client = openai(api_key=os.getenv("OPENAI_API_KEY"))
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = FastAPI(title="WEG Soft-Starter Chatbot")
 
@@ -15,15 +17,14 @@ class Pergunta(BaseModel):
 
 @app.post("/chat")
 def chat(pergunta: Pergunta):
-
-    resposta = client.chat.completions.create(
+    resposta = openai.ChatCompletion.create(
         model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",
                 "content": (
                     "Você é um assistente técnico especialista em Soft-Starter WEG SSW-07. "
-                    "Use SOMENTE as informações da base técnica abaixo.\n\n"
+                    "Use SOMENTE a base técnica abaixo.\n\n"
                     f"{base_weg}"
                 )
             },
@@ -33,25 +34,22 @@ def chat(pergunta: Pergunta):
             }
         ]
     )
-
     return {"resposta": resposta.choices[0].message.content}
-from fastapi import Request
-from fastapi.responses import PlainTextResponse
-from twilio.twiml.messaging_response import MessagingResponse
 
 @app.post("/whatsapp")
 async def whatsapp(request: Request):
     form = await request.form()
     mensagem = form.get("Body")
 
-    resposta_ai = client.chat.completions.create(
+    resposta_ai = openai.ChatCompletion.create(
         model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",
                 "content": (
                     "Você é um assistente técnico especialista em Soft-Starter WEG SSW-07. "
-                    "Use SOMENTE a base técnica fornecida."
+                    "Use SOMENTE a base técnica abaixo.\n\n"
+                    f"{base_weg}"
                 )
             },
             {
@@ -65,5 +63,3 @@ async def whatsapp(request: Request):
     resp.message(resposta_ai.choices[0].message.content)
 
     return PlainTextResponse(str(resp))
-    
-
