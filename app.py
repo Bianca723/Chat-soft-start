@@ -4,7 +4,7 @@ import os
 from openai import OpenAI
 from knowledge_base import carregar_base
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = openai(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = FastAPI(title="WEG Soft-Starter Chatbot")
 
@@ -35,7 +35,6 @@ def chat(pergunta: Pergunta):
     )
 
     return {"resposta": resposta.choices[0].message.content}
-
 from fastapi import Request
 from fastapi.responses import PlainTextResponse
 from twilio.twiml.messaging_response import MessagingResponse
