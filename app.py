@@ -2,17 +2,17 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import os
 from openai import OpenAI
+from knowledge_base import carregar_base
 
-# Inicializa a API da OpenAI
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = FastAPI(title="WEG Soft-Starter Chatbot")
 
-# Modelo de entrada
+base_weg = carregar_base()
+
 class Pergunta(BaseModel):
     pergunta: str
 
-# Rota principal
 @app.post("/chat")
 def chat(pergunta: Pergunta):
 
@@ -23,9 +23,8 @@ def chat(pergunta: Pergunta):
                 "role": "system",
                 "content": (
                     "Você é um assistente técnico especialista em Soft-Starter WEG SSW-07. "
-                    "Responda de forma clara, técnica e objetiva. "
-                    "Explique parâmetros, erros, alarmes e procedimentos de programação. "
-                    "Sempre que possível, cite os parâmetros (ex: P102, P110)."
+                    "Use SOMENTE as informações da base técnica abaixo.\n\n"
+                    f"{base_weg}"
                 )
             },
             {
@@ -35,11 +34,5 @@ def chat(pergunta: Pergunta):
         ]
     )
 
-    return {
-        "resposta": resposta.choices[0].message.content
-    }
+    return {"resposta": resposta.choices[0].message.content}
 
-# Rota de teste (opcional)
-@app.get("/")
-def root():
-    return {"status": "Chatbot WEG Soft-Starter rodando com sucesso"}
