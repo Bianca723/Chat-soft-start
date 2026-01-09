@@ -35,4 +35,35 @@ def chat(pergunta: Pergunta):
     )
 
     return {"resposta": resposta.choices[0].message.content}
+    from fastapi import Request
+from fastapi.responses import PlainTextResponse
+from twilio.twiml.messaging_response import MessagingResponse
+
+@app.post("/whatsapp")
+async def whatsapp(request: Request):
+    form = await request.form()
+    mensagem = form.get("Body")
+
+    resposta_ai = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Você é um assistente técnico especialista em Soft-Starter WEG SSW-07. "
+                    "Use SOMENTE a base técnica fornecida."
+                )
+            },
+            {
+                "role": "user",
+                "content": mensagem
+            }
+        ]
+    )
+
+    resp = MessagingResponse()
+    resp.message(resposta_ai.choices[0].message.content)
+
+    return PlainTextResponse(str(resp))
+    
 
