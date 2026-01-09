@@ -1,0 +1,17 @@
+WEG SSW-07 – BASE TÉCNICA
+
+Erro E28 – Comunicação Serial Inativa
+Causas:
+- Falta de telegramas Modbus dentro do tempo configurado
+- Parâmetro P314 configurado incorretamente
+Solução:
+- Verificar P314 (timeout)
+- Conferir P308 (endereço)
+- Conferir P312 (baud rate)
+
+Parâmetro P202 – Tipo de Controle
+Valor 2: Controle para bombas centrífugas
+Reduz golpe de aríete e corrente de partida
+
+Parâmetro P102 – Tempo de rampa de aceleração
+Define o tempo para atingir a tensão nominal
