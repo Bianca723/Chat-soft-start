@@ -35,7 +35,8 @@ def chat(pergunta: Pergunta):
     )
 
     return {"resposta": resposta.choices[0].message.content}
-    from fastapi import Request
+
+from fastapi import Request
 from fastapi.responses import PlainTextResponse
 from twilio.twiml.messaging_response import MessagingResponse
 
